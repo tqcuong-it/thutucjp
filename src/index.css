@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: 'Be Vietnam Pro', system-ui, sans-serif;
+  --color-brand: #2563eb;
+  --color-brand-dark: #1d4ed8;
+}
+
+/* Smooth scrolling */
+html { scroll-behavior: smooth; }
+
+/* Better focus states */
+*:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Print styles for form preview */
+@media print {
+  header, footer, .no-print { display: none !important; }
+  .print-only { display: block !important; }
+  body { background: white; }
+}
