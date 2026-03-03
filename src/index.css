@@ -18,7 +18,12 @@ html { scroll-behavior: smooth; }
 
 /* Print styles for form preview */
 @media print {
-  header, footer, .no-print { display: none !important; }
+  header, footer, nav, .no-print { display: none !important; }
   .print-only { display: block !important; }
+  body, main, #root, .min-h-screen { margin: 0 !important; padding: 0 !important; background: white !important; max-width: none !important; }
+  #official-form-print { margin: 0 !important; padding: 0 !important; }
+  .form-page { page-break-after: always; }
+  .official-form { border: none !important; box-shadow: none !important; }
+  @page { margin: 5mm; size: A4; }
   body { background: white; }
 }
