@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom'
 import { FileText, Clock, ChevronRight, Shield, Sparkles, Globe } from 'lucide-react'
 import { categories, forms } from '../data/forms'
+import { saveDraft } from '../lib/storage'
+import type { SavedProfile } from '../lib/storage'
+import ProfileManager from '../components/ProfileManager'
 
 const difficultyColor = {
   easy: 'bg-emerald-100 text-emerald-700',
@@ -10,6 +13,14 @@ const difficultyColor = {
 const difficultyLabel = { easy: 'Dễ', medium: 'Trung bình', hard: 'Khó' }
 
 export default function Home() {
+  const handleImport = (profile: SavedProfile) => {
+    // Save all form data to drafts
+    for (const [formId, data] of Object.entries(profile.forms)) {
+      saveDraft(formId, data)
+    }
+    window.location.reload()
+  }
+
   return (
     <div>
       {/* Hero */}
@@ -51,6 +62,11 @@ export default function Home() {
             <span>{forms.length} biểu mẫu</span>
           </div>
         </div>
+      </section>
+
+      {/* Profile Manager */}
+      <section className="mb-8 flex justify-center">
+        <ProfileManager onImport={handleImport} />
       </section>
 
       {/* Categories grid */}

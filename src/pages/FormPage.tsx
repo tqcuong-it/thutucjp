@@ -1,15 +1,46 @@
 import { useParams, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
-import { ArrowLeft, Download, Info, CheckCircle } from 'lucide-react'
+import { ArrowLeft, Download, Info, CheckCircle, Save, Trash2 } from 'lucide-react'
 import { forms } from '../data/forms'
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { saveDraft, loadDraft, clearDraft } from '../lib/storage'
 
 export default function FormPage() {
   const { formId } = useParams()
   const form = forms.find((f) => f.id === formId)
-  const { register, handleSubmit, formState: { errors } } = useForm()
+  const draft = formId ? loadDraft(formId) : null
+  const { register, handleSubmit, formState: { errors }, watch, reset: resetForm } = useForm({
+    defaultValues: draft || {},
+  })
   const [submitted, setSubmitted] = useState(false)
   const [formData, setFormData] = useState<Record<string, string>>({})
+  const [draftSaved, setDraftSaved] = useState(!!draft)
+
+  // Auto-save draft every 5 seconds
+  const watchAll = watch()
+  const autoSave = useCallback(() => {
+    if (formId && !submitted) {
+      const values = watchAll as Record<string, string>
+      const hasData = Object.values(values).some(v => v && v.trim())
+      if (hasData) {
+        saveDraft(formId, values)
+        setDraftSaved(true)
+      }
+    }
+  }, [formId, submitted, watchAll])
+
+  useEffect(() => {
+    const timer = setInterval(autoSave, 5000)
+    return () => clearInterval(timer)
+  }, [autoSave])
+
+  const handleClearDraft = () => {
+    if (formId && confirm('Xóa bản nháp? Dữ liệu đã nhập sẽ bị xóa.')) {
+      clearDraft(formId)
+      resetForm({})
+      setDraftSaved(false)
+    }
+  }
 
   if (!form) {
     return (
@@ -91,6 +122,18 @@ export default function FormPage() {
         <h1 className="text-2xl font-bold text-gray-900 mb-1">{form.title}</h1>
         <p className="text-gray-500">{form.titleJp}</p>
       </div>
+
+      {/* Draft indicator */}
+      {draftSaved && !submitted && (
+        <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5 mb-4">
+          <span className="text-sm text-emerald-700 flex items-center gap-1.5">
+            <Save className="w-4 h-4" /> Bản nháp đã lưu — dữ liệu sẽ tự động khôi phục khi quay lại
+          </span>
+          <button onClick={handleClearDraft} className="text-sm text-red-500 hover:text-red-700 flex items-center gap-1">
+            <Trash2 className="w-3.5 h-3.5" /> Xóa nháp
+          </button>
+        </div>
+      )}
 
       {/* Meta info */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
