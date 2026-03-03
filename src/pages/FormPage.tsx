@@ -92,15 +92,66 @@ export default function FormPage() {
         <p className="text-gray-500">{form.titleJp}</p>
       </div>
 
+      {/* Meta info */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        {form.fee && (
+          <div className="bg-gray-50 rounded-lg p-3 text-center">
+            <div className="text-xs text-gray-500">Phí</div>
+            <div className="font-semibold text-sm">{form.fee}</div>
+          </div>
+        )}
+        {form.processingTime && (
+          <div className="bg-gray-50 rounded-lg p-3 text-center">
+            <div className="text-xs text-gray-500">Thời gian xử lý</div>
+            <div className="font-semibold text-sm">{form.processingTime}</div>
+          </div>
+        )}
+        <div className="bg-gray-50 rounded-lg p-3 text-center">
+          <div className="text-xs text-gray-500">Số trường</div>
+          <div className="font-semibold text-sm">{form.fields.length} trường</div>
+        </div>
+        <div className="bg-gray-50 rounded-lg p-3 text-center">
+          <div className="text-xs text-gray-500">Thời gian điền</div>
+          <div className="font-semibold text-sm">{form.estimatedTime}</div>
+        </div>
+      </div>
+
+      {/* Official links */}
+      {(form.officialUrl || form.pdfUrl || form.excelUrl) && (
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6 flex flex-wrap gap-3">
+          {form.officialUrl && (
+            <a href={form.officialUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline">📄 Trang chính thức (入管庁)</a>
+          )}
+          {form.pdfUrl && (
+            <a href={form.pdfUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline">📋 Tải PDF gốc</a>
+          )}
+          {form.excelUrl && (
+            <a href={form.excelUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline">📊 Tải Excel gốc</a>
+          )}
+        </div>
+      )}
+
       {/* Tips */}
       {form.tips && form.tips.length > 0 && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
           <div className="flex items-center gap-2 font-semibold text-blue-800 mb-2">
-            <Info className="w-4 h-4" /> Lưu ý
+            <Info className="w-4 h-4" /> Lưu ý quan trọng
           </div>
           <ul className="text-sm text-blue-700 space-y-1">
             {form.tips.map((tip, i) => (
               <li key={i}>• {tip}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Required docs */}
+      {form.requiredDocs && form.requiredDocs.length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+          <div className="font-semibold text-amber-800 mb-2">📎 Giấy tờ cần chuẩn bị</div>
+          <ul className="text-sm text-amber-700 space-y-1">
+            {form.requiredDocs.map((doc, i) => (
+              <li key={i}>☐ {doc}</li>
             ))}
           </ul>
         </div>
