@@ -22,17 +22,6 @@ export default function About() {
           Bạn chỉ cần điền thông tin → hệ thống tạo biểu mẫu chuẩn format Nhật → in ra nộp.
         </p>
 
-        <h2 className="text-xl font-bold text-gray-800 mt-8 mb-3">👨‍💻 Tác giả</h2>
-        <p className="text-gray-600 mb-4">
-          <strong>Trần Quang Cương</strong> — Software Engineer / BrSE tại Nhật Bản, 
-          10+ năm kinh nghiệm IT. Đã trải qua mọi loại giấy tờ từ visa, 
-          thai sản, nenkin đến mua xe, thuê nhà. Hiểu rõ nỗi khổ của người Việt 
-          khi đối mặt với thủ tục hành chính Nhật.
-        </p>
-        <p className="text-gray-600">
-          Portfolio: <a href="https://cuongtq.it" className="text-blue-600 hover:underline" target="_blank" rel="noopener">cuongtq.it</a>
-        </p>
-
         <h2 className="text-xl font-bold text-gray-800 mt-8 mb-3">📬 Liên hệ</h2>
         <p className="text-gray-600">
           Email: <a href="mailto:contact@thutucjp.com" className="text-blue-600 hover:underline">contact@thutucjp.com</a>
