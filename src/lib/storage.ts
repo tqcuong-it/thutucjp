@@ -82,7 +82,7 @@ export async function exportProfile(
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = fileName || `thutucjp-${profile.name || 'data'}.thutuc`
+  a.download = fileName || `thutucjp-${profile.name || 'data'}.thutucjp_com`
   a.click()
   URL.revokeObjectURL(url)
 }

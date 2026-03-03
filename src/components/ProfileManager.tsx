@@ -151,11 +151,11 @@ export default function ProfileManager({ onImport }: Props) {
 
         {mode === 'import' && (
           <div>
-            <label className="text-sm font-medium text-gray-600">Chọn file .thutuc</label>
+            <label className="text-sm font-medium text-gray-600">Chọn file .thutucjp_com</label>
             <input
               ref={fileRef}
               type="file"
-              accept=".thutuc"
+              accept=".thutucjp_com"
               className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm mt-1 file:mr-3 file:px-3 file:py-1 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 file:font-medium file:text-sm"
             />
           </div>
