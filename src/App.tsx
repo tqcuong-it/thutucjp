@@ -3,6 +3,7 @@ import Layout from './components/layout/Layout'
 import Home from './pages/Home'
 import FormPage from './pages/FormPage'
 import About from './pages/About'
+import Privacy from './pages/Privacy'
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/form/:formId" element={<FormPage />} />
           <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<Privacy />} />
         </Route>
       </Routes>
     </BrowserRouter>

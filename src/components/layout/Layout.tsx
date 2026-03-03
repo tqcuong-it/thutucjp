@@ -52,6 +52,11 @@ export default function Layout() {
       {/* Footer */}
       <footer className="border-t border-gray-200 bg-white mt-12">
         <div className="max-w-5xl mx-auto px-4 py-6 text-center text-sm text-gray-500">
+          <div className="mb-2">
+            <Link to="/privacy" className="hover:text-blue-600">Bảo mật</Link>
+            <span className="mx-2">·</span>
+            <Link to="/about" className="hover:text-blue-600">Giới thiệu</Link>
+          </div>
           © 2026 ThủTụcJP — Giấy tờ tại Nhật, dễ như ở nhà 🇻🇳🇯🇵
         </div>
       </footer>
