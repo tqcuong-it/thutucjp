@@ -16,6 +16,23 @@ export default function FormPage() {
   const [submitted, setSubmitted] = useState(false)
   const [formData, setFormData] = useState<Record<string, string>>({})
   const [draftSaved, setDraftSaved] = useState(!!draft)
+  const [excelLoading, setExcelLoading] = useState(false)
+  const [excelWarnings, setExcelWarnings] = useState<string[]>([])
+
+  const handleExcelDownload = async () => {
+    if (!formId) return
+    setExcelLoading(true)
+    setExcelWarnings([])
+    try {
+      const result = await fillAndDownloadExcel(formId, formData)
+      if (result.warnings.length > 0) setExcelWarnings(result.warnings)
+      if (!result.success) setExcelWarnings(prev => [...prev, '❌ Xuất Excel thất bại'])
+    } catch {
+      setExcelWarnings(['❌ Lỗi không xác định'])
+    } finally {
+      setExcelLoading(false)
+    }
+  }
 
   // Auto-save draft every 5 seconds
   const watchAll = watch()
@@ -81,10 +98,11 @@ export default function FormPage() {
           <div className="flex flex-wrap gap-3 mb-6">
             {hasExcelFill(formId!) && (
               <button
-                onClick={() => fillAndDownloadExcel(formId!, formData)}
-                className="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700 transition-colors text-lg"
+                onClick={handleExcelDownload}
+                disabled={excelLoading}
+                className="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700 transition-colors text-lg disabled:opacity-50"
               >
-                📥 Tải Excel đã điền
+                {excelLoading ? '⏳ Đang tải template từ ISA...' : '📥 Tải Excel đã điền'}
               </button>
             )}
             <button
@@ -100,6 +118,15 @@ export default function FormPage() {
               ✏️ Sửa lại
             </button>
           </div>
+
+          {/* Excel fill warnings */}
+          {excelWarnings.length > 0 && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+              {excelWarnings.map((w, i) => (
+                <p key={i} className="text-sm text-amber-700">{w}</p>
+              ))}
+            </div>
+          )}
 
           {/* Official form download links */}
           {(form.pdfUrl || form.excelUrl) && (
