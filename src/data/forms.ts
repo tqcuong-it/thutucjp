@@ -108,60 +108,170 @@ export const categories: FormCategory[] = [
 ]
 
 // ===== COMMON FIELD SETS =====
-const personalFields: FormField[] = [
-  { id: 'nationality', label: 'Quốc tịch', labelJp: '国籍・地域', type: 'text', placeholder: 'ベトナム', required: true, section: 'Thông tin cá nhân（個人情報）' },
-  { id: 'name_romaji', label: 'Họ tên (chữ La-tinh)', labelJp: '氏名（ローマ字）', type: 'text', placeholder: 'NGUYEN VAN A', required: true, section: 'Thông tin cá nhân（個人情報）' },
-  { id: 'name_kanji', label: 'Họ tên (Kanji)', labelJp: '氏名（漢字）', type: 'text', hint: 'Nếu không có kanji thì bỏ trống', section: 'Thông tin cá nhân（個人情報）' },
-  { id: 'dob', label: 'Ngày sinh', labelJp: '生年月日', type: 'date', required: true, section: 'Thông tin cá nhân（個人情報）' },
-  { id: 'gender', label: 'Giới tính', labelJp: '性別', type: 'radio', options: [{ value: 'male', label: 'Nam（男）' }, { value: 'female', label: 'Nữ（女）' }], required: true, section: 'Thông tin cá nhân（個人情報）' },
-  { id: 'marital_status', label: 'Tình trạng hôn nhân', labelJp: '配偶者の有無', type: 'radio', options: [{ value: 'married', label: 'Đã kết hôn（有）' }, { value: 'single', label: 'Chưa kết hôn（無）' }], required: true, section: 'Thông tin cá nhân（個人情報）' },
+// Based on actual ISA 別記第三十号様式 (在留資格変更/在留期間更新 共通)
+
+const visaStatusOptions = [
+  { value: 'engineer', label: '技術・人文知識・国際業務（Kỹ sư/Nhân văn）' },
+  { value: 'spouse', label: '日本人の配偶者等（Vợ/chồng người Nhật）' },
+  { value: 'family', label: '家族滞在（Gia đình）' },
+  { value: 'permanent_spouse', label: '永住者の配偶者等（Vợ/chồng vĩnh trú）' },
+  { value: 'long_term', label: '定住者（Định cư）' },
+  { value: 'student', label: '留学（Du học）' },
+  { value: 'specified_skilled', label: '特定技能（Kỹ năng đặc định）' },
+  { value: 'technical_intern', label: '技能実習（Thực tập sinh）' },
+  { value: 'business_manager', label: '経営・管理（Kinh doanh/Quản lý）' },
+  { value: 'highly_skilled', label: '高度専門職（Chuyên môn cao cấp）' },
+  { value: 'designated', label: '特定活動（Hoạt động đặc biệt）' },
+  { value: 'nursing', label: '介護（Điều dưỡng）' },
+  { value: 'skilled', label: '技能（Kỹ năng）' },
+  { value: 'other', label: 'Khác' },
 ]
 
-const residenceFields: FormField[] = [
-  { id: 'residence_card_no', label: 'Số thẻ cư trú', labelJp: '在留カード番号', type: 'text', placeholder: 'AB12345678CD', required: true, section: 'Thông tin cư trú（在留情報）' },
-  { id: 'current_status', label: 'Tư cách lưu trú hiện tại', labelJp: '在留資格', type: 'select', options: [
-    { value: 'engineer', label: '技術・人文知識・国際業務（Kỹ sư/Nhân văn）' },
-    { value: 'spouse', label: '日本人の配偶者等（Vợ/chồng người Nhật）' },
-    { value: 'family', label: '家族滞在（Gia đình）' },
-    { value: 'permanent_spouse', label: '永住者の配偶者等（Vợ/chồng vĩnh trú）' },
-    { value: 'long_term', label: '定住者（Định cư）' },
-    { value: 'student', label: '留学（Du học）' },
-    { value: 'specified_skilled', label: '特定技能（Kỹ năng đặc định）' },
-    { value: 'technical_intern', label: '技能実習（Thực tập sinh）' },
-    { value: 'business_manager', label: '経営・管理（Kinh doanh/Quản lý）' },
-    { value: 'highly_skilled', label: '高度専門職（Chuyên môn cao cấp）' },
-    { value: 'designated', label: '特定活動（Hoạt động đặc biệt）' },
+// ── Sheet 1: 申請人等作成用１ ──
+// Mục 1~16 trên form ISA
+
+const sec1 = '① Thông tin cá nhân（個人情報）'
+const sec2 = '② Cư trú & Hộ chiếu（在留・旅券）'
+const sec3 = '③ Thân nhân tại Nhật（在日親族）'
+
+const isaSheet1Fields: FormField[] = [
+  // 1. Quốc tịch
+  { id: 'nationality', label: 'Quốc tịch', labelJp: '①国籍・地域', type: 'text', placeholder: 'ベトナム', required: true, section: sec1, hint: 'Viết bằng tiếng Nhật. VD: ベトナム' },
+  // 2. Ngày sinh
+  { id: 'dob', label: 'Ngày sinh', labelJp: '②生年月日', type: 'date', required: true, section: sec1 },
+  // 3. Họ tên
+  { id: 'name_family', label: 'Họ (Family name)', labelJp: '③氏名 Family name', type: 'text', placeholder: 'NGUYEN', required: true, section: sec1, hint: 'Viết IN HOA giống hộ chiếu' },
+  { id: 'name_given', label: 'Tên (Given name)', labelJp: '③氏名 Given name', type: 'text', placeholder: 'VAN A', required: true, section: sec1, hint: 'Viết IN HOA giống hộ chiếu' },
+  // 4. Giới tính
+  { id: 'gender', label: 'Giới tính', labelJp: '④性別', type: 'radio', options: [{ value: 'male', label: 'Nam（男）' }, { value: 'female', label: 'Nữ（女）' }], required: true, section: sec1 },
+  // 5. Nơi sinh
+  { id: 'birthplace', label: 'Nơi sinh', labelJp: '⑤出生地', type: 'text', placeholder: 'Ha Noi, Viet Nam', required: true, section: sec1, hint: 'Thành phố + quốc gia' },
+  // 6. Hôn nhân
+  { id: 'marital_status', label: 'Tình trạng hôn nhân', labelJp: '⑥配偶者の有無', type: 'radio', options: [{ value: 'married', label: 'Đã kết hôn（有）' }, { value: 'single', label: 'Chưa（無）' }], required: true, section: sec1 },
+  // 7. Nghề nghiệp
+  { id: 'occupation', label: 'Nghề nghiệp', labelJp: '⑦職業', type: 'text', placeholder: '会社員 / 学生 / 主婦', required: true, section: sec1, hint: 'VD: 会社員 (nhân viên), 学生 (sinh viên)' },
+  // 8. Quê quán
+  { id: 'home_country_address', label: 'Địa chỉ tại quê nhà', labelJp: '⑧本国における居住地', type: 'text', placeholder: 'Ha Noi, Viet Nam', section: sec1, hint: 'Địa chỉ ở Việt Nam (nếu có)' },
+  // 9. Địa chỉ tại Nhật
+  { id: 'address', label: 'Địa chỉ tại Nhật', labelJp: '⑨住居地', type: 'textarea', placeholder: '東京都新宿区○○1-2-3 △△マンション101', required: true, section: sec1, hint: 'Viết đầy đủ đến số phòng, bằng tiếng Nhật' },
+  { id: 'phone', label: 'SĐT cố định', labelJp: '電話番号', type: 'phone', placeholder: '03-XXXX-XXXX', section: sec1, hint: 'Không bắt buộc nếu có SĐT di động' },
+  { id: 'mobile', label: 'SĐT di động', labelJp: '携帯電話番号', type: 'phone', placeholder: '080-XXXX-XXXX', required: true, section: sec1 },
+  // 10. Hộ chiếu
+  { id: 'passport_no', label: 'Số hộ chiếu', labelJp: '⑩旅券 番号', type: 'text', placeholder: 'C1234567', required: true, section: sec2, hint: 'Ghi đúng theo hộ chiếu' },
+  { id: 'passport_expiry', label: 'Hạn hộ chiếu', labelJp: '⑩旅券 有効期限', type: 'date', required: true, section: sec2 },
+  // 11. Tư cách lưu trú hiện tại
+  { id: 'current_status', label: 'Visa hiện tại', labelJp: '⑪現に有する在留資格', type: 'select', options: visaStatusOptions, required: true, section: sec2 },
+  { id: 'current_period', label: 'Thời hạn visa', labelJp: '在留期間', type: 'select', options: [
+    { value: '5year', label: '5 năm' }, { value: '3year', label: '3 năm' }, { value: '1year', label: '1 năm' },
+    { value: '6month', label: '6 tháng' }, { value: '4month_15day', label: '4 tháng 15 ngày' },
+    { value: '3month', label: '3 tháng' }, { value: '1month', label: '1 tháng' },
+  ], required: true, section: sec2 },
+  { id: 'expiry_date', label: 'Ngày hết hạn visa', labelJp: '在留期間の満了日', type: 'date', required: true, section: sec2, hint: 'Xem mặt trước 在留カード' },
+  // 12. Thẻ cư trú
+  { id: 'residence_card_no', label: 'Số thẻ cư trú', labelJp: '⑫在留カード番号', type: 'text', placeholder: 'AB12345678CD', required: true, section: sec2, hint: 'Mặt trước 在留カード, 12 ký tự' },
+  // 15. Tiền án
+  { id: 'criminal_record', label: 'Tiền án (bao gồm nước ngoài)', labelJp: '⑮犯罪を理由とする処分の有無', type: 'radio', options: [
+    { value: 'no', label: 'Không có（無）' },
+    { value: 'yes', label: 'Có（有）' },
+  ], required: true, section: sec2, hint: 'Bao gồm vi phạm giao thông ở cả Nhật và nước ngoài' },
+  { id: 'criminal_detail', label: 'Chi tiết tiền án (nếu có)', labelJp: '具体的内容', type: 'textarea', section: sec2, hint: 'Chỉ điền nếu chọn "Có" ở trên' },
+  // 16. Thân nhân tại Nhật
+  { id: 'has_family_japan', label: 'Có thân nhân tại Nhật?', labelJp: '⑯在日親族の有無', type: 'radio', options: [
+    { value: 'yes', label: 'Có（有）' },
+    { value: 'no', label: 'Không（無）' },
+  ], required: true, section: sec3 },
+  { id: 'family1_relationship', label: 'Quan hệ (người 1)', labelJp: '続柄', type: 'select', options: [
+    { value: '', label: '— Chọn —' },
+    { value: '配偶者', label: 'Vợ/Chồng（配偶者）' },
+    { value: '子', label: 'Con（子）' },
+    { value: '父', label: 'Cha（父）' },
+    { value: '母', label: 'Mẹ（母）' },
+    { value: '兄弟姉妹', label: 'Anh/Chị/Em（兄弟姉妹）' },
+  ], section: sec3, hint: 'Điền nếu có thân nhân tại Nhật' },
+  { id: 'family1_name', label: 'Họ tên (người 1)', labelJp: '氏名', type: 'text', section: sec3 },
+  { id: 'family1_dob', label: 'Ngày sinh (người 1)', labelJp: '生年月日', type: 'date', section: sec3 },
+  { id: 'family1_nationality', label: 'Quốc tịch (người 1)', labelJp: '国籍・地域', type: 'text', placeholder: 'ベトナム', section: sec3 },
+  { id: 'family1_cohabit', label: 'Sống cùng?', labelJp: '同居の有無', type: 'radio', options: [{ value: 'yes', label: 'Có（有）' }, { value: 'no', label: 'Không（無）' }], section: sec3 },
+  { id: 'family1_workplace', label: 'Nơi làm việc/học (người 1)', labelJp: '勤務先名称・通学先名称', type: 'text', section: sec3 },
+  { id: 'family1_residence_card', label: 'Số 在留カード (người 1)', labelJp: '在留カード番号', type: 'text', section: sec3 },
+]
+
+// ── Sheet 3: 申請人等作成用２N ──
+// Mục 17~22 (cho visa 技人国, 高度専門職, etc.)
+
+const sec4 = '④ Nơi làm việc（勤務先）'
+const sec5 = '⑤ Học vấn（最終学歴）'
+const sec6 = '⑥ Kinh nghiệm làm việc（職歴）'
+
+const isaSheet3Fields: FormField[] = [
+  // 17. Nơi làm việc
+  { id: 'company_name', label: 'Tên công ty', labelJp: '⑰勤務先(1)名称', type: 'text', placeholder: '株式会社 ○○', required: true, section: sec4, hint: 'Tên chính thức đầy đủ, bằng tiếng Nhật' },
+  { id: 'company_branch', label: 'Chi nhánh/Văn phòng', labelJp: '支店・事業所名', type: 'text', section: sec4, hint: 'Nếu làm ở chi nhánh, không phải trụ sở chính' },
+  { id: 'company_address', label: 'Địa chỉ nơi làm việc', labelJp: '(2)所在地', type: 'textarea', placeholder: '東京都港区○○2-3-8', required: true, section: sec4, hint: 'Địa chỉ nơi bạn THỰC SỰ làm việc (có thể khác trụ sở chính)' },
+  { id: 'company_phone', label: 'SĐT nơi làm việc', labelJp: '(3)電話番号', type: 'phone', placeholder: '03-XXXX-XXXX', required: true, section: sec4 },
+  // 18. Học vấn
+  { id: 'school_location', label: 'Trường ở đâu?', labelJp: '⑱最終学歴 本邦/外国', type: 'radio', options: [
+    { value: 'japan', label: 'Nhật Bản（本邦）' },
+    { value: 'foreign', label: 'Nước ngoài（外国）' },
+  ], required: true, section: sec5 },
+  { id: 'school_level', label: 'Trình độ', labelJp: '学歴レベル', type: 'select', options: [
+    { value: 'doctor', label: 'Tiến sĩ（大学院 博士）' },
+    { value: 'master', label: 'Thạc sĩ（大学院 修士）' },
+    { value: 'bachelor', label: 'Đại học（大学）' },
+    { value: 'junior_college', label: 'Cao đẳng（短期大学）' },
+    { value: 'vocational', label: 'Trường nghề（専門学校）' },
+    { value: 'high_school', label: 'THPT（高等学校）' },
+    { value: 'junior_high', label: 'THCS（中学校）' },
+    { value: 'other', label: 'Khác（その他）' },
+  ], required: true, section: sec5 },
+  { id: 'school_name', label: 'Tên trường', labelJp: '(3)学校名', type: 'text', placeholder: 'ハノイ工科大学', required: true, section: sec5, hint: 'Viết bằng tiếng Nhật hoặc tiếng Anh' },
+  { id: 'graduation_date', label: 'Ngày tốt nghiệp', labelJp: '(4)卒業年月日', type: 'date', required: true, section: sec5 },
+  // 19. Chuyên ngành
+  { id: 'major', label: 'Chuyên ngành', labelJp: '⑲専攻・専門分野', type: 'select', options: [
+    { value: 'engineering', label: 'Kỹ thuật（工学）' },
+    { value: 'computer_science', label: 'CNTT（情報科学）' },
+    { value: 'economics', label: 'Kinh tế（経済学）' },
+    { value: 'business', label: 'Quản trị KD（経営学）' },
+    { value: 'law', label: 'Luật（法学）' },
+    { value: 'literature', label: 'Văn học（文学）' },
+    { value: 'linguistics', label: 'Ngôn ngữ（語学）' },
+    { value: 'science', label: 'Khoa học（理学）' },
+    { value: 'chemistry', label: 'Hóa học（化学）' },
+    { value: 'agriculture', label: 'Nông nghiệp（農学）' },
+    { value: 'medicine', label: 'Y khoa（医学）' },
+    { value: 'nursing', label: 'Điều dưỡng（介護福祉）' },
+    { value: 'education', label: 'Giáo dục（教育学）' },
+    { value: 'sociology', label: 'Xã hội học（社会学）' },
     { value: 'other', label: 'Khác' },
-  ], required: true, section: 'Thông tin cư trú（在留情報）' },
-  { id: 'expiry_date', label: 'Ngày hết hạn visa', labelJp: '在留期間の満了日', type: 'date', required: true, section: 'Thông tin cư trú（在留情報）' },
+  ], required: true, section: sec5 },
+  // 20. Chứng chỉ IT
+  { id: 'has_it_cert', label: 'Có chứng chỉ IT không?', labelJp: '⑳情報処理技術者資格の有無', type: 'radio', options: [
+    { value: 'no', label: 'Không（無）' },
+    { value: 'yes', label: 'Có（有）' },
+  ], section: sec5, hint: 'VD: 基本情報, 応用情報, JITEC, AWS certified...' },
+  { id: 'it_cert_name', label: 'Tên chứng chỉ IT', labelJp: '資格名又は試験名', type: 'text', placeholder: '基本情報技術者, AWS Solutions Architect', section: sec5, hint: 'Liệt kê các chứng chỉ, cách nhau bằng dấu phẩy' },
+  // 21. Kinh nghiệm làm việc
+  { id: 'work1_join', label: 'Công ty 1: Ngày vào', labelJp: '⑳職歴 入社', type: 'text', placeholder: '2018/04', section: sec6, hint: 'Năm/Tháng. VD: 2018/04' },
+  { id: 'work1_leave', label: 'Công ty 1: Ngày nghỉ', labelJp: '退社', type: 'text', placeholder: '2022/03', section: sec6, hint: 'Để trống nếu đang làm' },
+  { id: 'work1_company', label: 'Công ty 1: Tên', labelJp: '勤務先名称', type: 'text', placeholder: 'ABC Corporation', section: sec6 },
+  { id: 'work2_join', label: 'Công ty 2: Ngày vào', labelJp: '入社', type: 'text', placeholder: '2022/04', section: sec6 },
+  { id: 'work2_leave', label: 'Công ty 2: Ngày nghỉ', labelJp: '退社', type: 'text', section: sec6 },
+  { id: 'work2_company', label: 'Công ty 2: Tên', labelJp: '勤務先名称', type: 'text', section: sec6 },
 ]
 
-const addressFields: FormField[] = [
-  { id: 'postal_code', label: 'Mã bưu điện', labelJp: '郵便番号', type: 'text', placeholder: '123-4567', required: true, section: 'Địa chỉ & Liên lạc（住所・連絡先）' },
-  { id: 'address', label: 'Địa chỉ tại Nhật', labelJp: '住居地', type: 'textarea', placeholder: '東京都新宿区○○1-2-3', required: true, section: 'Địa chỉ & Liên lạc（住所・連絡先）' },
-  { id: 'phone', label: 'Số điện thoại', labelJp: '電話番号', type: 'phone', placeholder: '080-XXXX-XXXX', required: true, section: 'Địa chỉ & Liên lạc（住所・連絡先）' },
-  { id: 'email', label: 'Email', labelJp: '電子メール', type: 'text', placeholder: 'email@example.com', section: 'Địa chỉ & Liên lạc（住所・連絡先）' },
-]
-
-const passportFields: FormField[] = [
-  { id: 'passport_no', label: 'Số hộ chiếu', labelJp: '旅券番号', type: 'text', required: true, section: 'Hộ chiếu（旅券）' },
-  { id: 'passport_expiry', label: 'Ngày hết hạn hộ chiếu', labelJp: '旅券有効期限', type: 'date', required: true, section: 'Hộ chiếu（旅券）' },
-]
-
-const companyFields: FormField[] = [
-  { id: 'company_name', label: 'Tên công ty', labelJp: '勤務先名称', type: 'text', placeholder: '株式会社 ○○', required: true, section: 'Công việc（勤務先）' },
-  { id: 'company_address', label: 'Địa chỉ công ty', labelJp: '勤務先所在地', type: 'textarea', placeholder: '東京都○○区...', required: true, section: 'Công việc（勤務先）' },
-  { id: 'company_phone', label: 'SĐT công ty', labelJp: '勤務先電話番号', type: 'phone', section: 'Công việc（勤務先）' },
-  { id: 'job_description', label: 'Nội dung công việc', labelJp: '職務内容', type: 'textarea', placeholder: 'システム開発、プログラミング...', section: 'Công việc（勤務先）' },
-  { id: 'salary', label: 'Thu nhập hàng năm (¥)', labelJp: '年収', type: 'number', placeholder: '4800000', hint: 'Tổng thu nhập trước thuế', section: 'Công việc（勤務先）' },
-]
+// ── Reuse field sets (backward compat) ──
+const personalFields = isaSheet1Fields.filter(f => f.section === sec1)
+const residenceFields = isaSheet1Fields.filter(f => f.section === sec2)
+const addressFields = personalFields.filter(f => ['address', 'phone', 'mobile'].includes(f.id))
+const passportFields = isaSheet1Fields.filter(f => ['passport_no', 'passport_expiry'].includes(f.id))
+const companyFields = isaSheet3Fields.filter(f => f.section === sec4)
 
 const bankFields: FormField[] = [
   { id: 'bank_name', label: 'Ngân hàng', labelJp: '金融機関名', type: 'text', placeholder: '楽天銀行', required: true, section: 'Tài khoản nhận tiền（振込先）' },
   { id: 'branch_name', label: 'Chi nhánh', labelJp: '支店名', type: 'text', required: true, section: 'Tài khoản nhận tiền（振込先）' },
   { id: 'account_type', label: 'Loại tài khoản', labelJp: '口座種別', type: 'radio', options: [{ value: 'normal', label: 'Thường（普通）' }, { value: 'current', label: 'Vãng lai（当座）' }], required: true, section: 'Tài khoản nhận tiền（振込先）' },
   { id: 'account_no', label: 'Số tài khoản', labelJp: '口座番号', type: 'text', required: true, section: 'Tài khoản nhận tiền（振込先）' },
-  { id: 'account_holder', label: 'Tên chủ tài khoản (カタカナ)', labelJp: '口座名義（カタカナ）', type: 'text', required: true, section: 'Tài khoản nhận tiền（振込先）' },
+  { id: 'account_holder', label: 'Tên chủ TK (カタカナ)', labelJp: '口座名義（カタカナ）', type: 'text', required: true, section: 'Tài khoản nhận tiền（振込先）' },
 ]
 
 // ===== FORMS =====
@@ -218,14 +328,13 @@ export const forms: FormTemplate[] = [
       ],
     },
     fields: [
-      ...personalFields,
-      ...residenceFields,
-      { id: 'desired_period', label: 'Thời gian muốn gia hạn', labelJp: '希望する在留期間', type: 'select', options: [
+      ...isaSheet1Fields,
+      // 13. Thời hạn mong muốn (khác với change: không cần lý do)
+      { id: 'desired_period', label: 'Thời hạn mong muốn', labelJp: '⑬希望する在留期間', type: 'select', options: [
         { value: '5year', label: '5 năm' }, { value: '3year', label: '3 năm' }, { value: '1year', label: '1 năm' },
-      ], required: true, section: 'Thông tin cư trú（在留情報）' },
-      ...addressFields,
-      ...passportFields,
-      ...companyFields,
+      ], required: true, section: sec2, hint: 'Kết quả phụ thuộc xét duyệt' },
+      // Sheet 3 fields
+      ...isaSheet3Fields,
     ],
   },
   {
@@ -278,22 +387,16 @@ export const forms: FormTemplate[] = [
       ],
     },
     fields: [
-      ...personalFields,
-      ...residenceFields,
-      { id: 'new_status', label: 'Tư cách lưu trú muốn đổi sang', labelJp: '変更を希望する在留資格', type: 'select', options: [
-        { value: 'engineer', label: '技術・人文知識・国際業務（Kỹ sư/Nhân văn）' },
-        { value: 'spouse', label: '日本人の配偶者等（Vợ/chồng người Nhật）' },
-        { value: 'family', label: '家族滞在（Gia đình）' },
-        { value: 'specified_skilled', label: '特定技能（Kỹ năng đặc định）' },
-        { value: 'business_manager', label: '経営・管理（Kinh doanh）' },
-        { value: 'designated', label: '特定活動（Hoạt động đặc biệt）' },
-        { value: 'long_term', label: '定住者（Định cư）' },
-        { value: 'other', label: 'Khác' },
-      ], required: true, section: 'Thông tin cư trú（在留情報）' },
-      { id: 'reason', label: 'Lý do đổi tư cách', labelJp: '変更の理由', type: 'textarea', required: true, hint: 'VD: Tốt nghiệp đại học, xin được việc tại công ty ○○', section: 'Thông tin cư trú（在留情報）' },
-      ...addressFields,
-      ...passportFields,
-      ...companyFields,
+      ...isaSheet1Fields,
+      // 13. Visa muốn đổi sang
+      { id: 'new_status', label: 'Visa muốn đổi sang', labelJp: '⑬希望する在留資格', type: 'select', options: visaStatusOptions, required: true, section: sec2 },
+      { id: 'desired_period', label: 'Thời hạn mong muốn', labelJp: '在留期間', type: 'select', options: [
+        { value: '5year', label: '5 năm' }, { value: '3year', label: '3 năm' }, { value: '1year', label: '1 năm' },
+      ], required: true, section: sec2, hint: 'Kết quả phụ thuộc xét duyệt, có thể không đúng mong muốn' },
+      // 14. Lý do
+      { id: 'reason', label: 'Lý do đổi tư cách', labelJp: '⑭変更の理由', type: 'textarea', required: true, section: sec2, hint: 'VD: Tốt nghiệp ĐH, được nhận vào công ty ○○ làm SE' },
+      // Sheet 3 fields
+      ...isaSheet3Fields,
     ],
   },
   {
