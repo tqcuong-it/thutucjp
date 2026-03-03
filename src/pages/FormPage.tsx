@@ -4,7 +4,7 @@ import { ArrowLeft, Download, Info, CheckCircle, Save, Trash2, MapPin, FileText,
 import { forms } from '../data/forms'
 import { useState, useEffect, useCallback } from 'react'
 import { saveDraft, loadDraft, clearDraft } from '../lib/storage'
-import OfficialFormPreview from '../components/OfficialFormPreview'
+import { fillAndDownloadExcel, hasExcelFill } from '../lib/excel-fill'
 
 export default function FormPage() {
   const { formId } = useParams()
@@ -61,10 +61,6 @@ export default function FormPage() {
   }
 
   // Print the official form
-  const handlePrint = () => {
-    window.print()
-  }
-
   if (submitted) {
     return (
       <div>
@@ -82,12 +78,20 @@ export default function FormPage() {
           </div>
 
           {/* Action buttons */}
-          <div className="flex gap-3 mb-6">
+          <div className="flex flex-wrap gap-3 mb-6">
+            {hasExcelFill(formId!) && (
+              <button
+                onClick={() => fillAndDownloadExcel(formId!, formData)}
+                className="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700 transition-colors text-lg"
+              >
+                📥 Tải Excel đã điền
+              </button>
+            )}
             <button
-              onClick={handlePrint}
-              className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors text-lg"
+              onClick={() => window.print()}
+              className={`${hasExcelFill(formId!) ? 'px-5' : 'flex-1'} bg-blue-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors`}
             >
-              🖨️ In form / Save PDF
+              🖨️ In tóm tắt
             </button>
             <button
               onClick={() => setSubmitted(false)}
@@ -125,12 +129,41 @@ export default function FormPage() {
           )}
         </div>
 
-        {/* Official form preview (THIS is what gets printed) */}
-        <div className="mb-6 border border-gray-300 rounded-xl overflow-hidden shadow-sm">
-          <div className="bg-gray-100 px-4 py-2 text-sm font-medium text-gray-600 flex items-center gap-2 no-print">
-            <FileText className="w-4 h-4" /> Preview — Form sẽ được in như bên dưới
-          </div>
-          <OfficialFormPreview form={form} data={formData} />
+        {/* Data summary (printable) */}
+        <div className="mb-6 bg-white border border-gray-200 rounded-2xl p-5">
+          <h3 className="font-bold text-gray-900 mb-1 flex items-center gap-2">
+            <FileText className="w-5 h-5 text-gray-500" /> Thông tin đã điền
+          </h3>
+          {hasExcelFill(formId!) && (
+            <p className="text-xs text-emerald-600 mb-4">✅ Bấm "Tải Excel đã điền" ở trên — file Excel chính thức sẽ có sẵn thông tin của bạn, in ra nộp được luôn.</p>
+          )}
+          {!hasExcelFill(formId!) && (
+            <p className="text-xs text-gray-400 mb-4">Dùng thông tin dưới đây để điền vào form chính thức.</p>
+          )}
+          {sections.map((section) => (
+            <div key={section} className="mb-5 last:mb-0">
+              <h4 className="font-semibold text-gray-700 border-b pb-1 mb-3 text-sm">{section}</h4>
+              <dl className="space-y-1.5">
+                {form.fields
+                  .filter((f) => (f.section || 'Khác') === section)
+                  .map((field) => {
+                    let displayValue = formData[field.id] || '—'
+                    if (field.options) {
+                      const opt = field.options.find(o => o.value === formData[field.id])
+                      if (opt) displayValue = opt.label
+                    }
+                    return (
+                      <div key={field.id} className="flex gap-2 text-sm">
+                        <dt className="text-gray-400 min-w-[160px] flex-shrink-0">
+                          {field.labelJp || field.label}:
+                        </dt>
+                        <dd className="font-medium text-gray-900">{displayValue}</dd>
+                      </div>
+                    )
+                  })}
+              </dl>
+            </div>
+          ))}
         </div>
 
         {/* STEP 3: Where to submit */}
