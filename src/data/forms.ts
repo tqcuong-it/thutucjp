@@ -10,6 +10,16 @@ export interface FormField {
   section?: string
 }
 
+export interface SubmissionInfo {
+  where: string
+  whereJp: string
+  address?: string
+  hours?: string
+  howToSubmit: string[]
+  afterSubmit: string[]
+  importantNotes?: string[]
+}
+
 export interface FormTemplate {
   id: string
   title: string
@@ -27,6 +37,7 @@ export interface FormTemplate {
   fields: FormField[]
   tips?: string[]
   requiredDocs?: string[]
+  submission?: SubmissionInfo
 }
 
 export interface FormCategory {
@@ -185,6 +196,27 @@ export const forms: FormTemplate[] = [
       'Giấy tờ công ty（登記事項証明書, 決算書等）',
       'Hợp đồng lao động（雇用契約書）',
     ],
+    submission: {
+      where: '出入国在留管理局（入管）',
+      whereJp: '地方出入国在留管理局',
+      hours: '9:00-12:00, 13:00-16:00（thứ 2~6, trừ ngày lễ）',
+      howToSubmit: [
+        '📥 Download form chính thức từ link bên dưới → in ra → điền theo thông tin đã nhập ở ThủTụcJP',
+        '📋 Hoặc nộp online qua 在留申請オンラインシステム (cần My Number Card)',
+        '🏢 Mang hồ sơ đến 入管局 gần nhất → lấy số → chờ gọi',
+        '💴 Mua 収入印紙 ¥6,000 tại quầy trong 入管 (mua sau khi được duyệt)',
+      ],
+      afterSubmit: [
+        '📄 Nhận はがき (bưu thiếp) khi có kết quả — thường 2 tuần ~ 1 tháng',
+        '🏢 Mang はがき + hộ chiếu + 在留カード + 収入印紙 ¥6,000 đến nhận thẻ mới',
+        '💳 在留カード mới được cấp ngay tại quầy',
+      ],
+      importantNotes: [
+        '⚠️ Nộp trước khi visa hết hạn — nếu đang chờ kết quả, visa tự động gia hạn 2 tháng',
+        '⚠️ KHÔNG được làm việc khác tư cách hiện tại trong khi chờ',
+        '💡 Đến sớm (trước 9:00) — 入管 rất đông, đặc biệt thứ 2 và cuối tháng',
+      ],
+    },
     fields: [
       ...personalFields,
       ...residenceFields,
@@ -224,6 +256,27 @@ export const forms: FormTemplate[] = [
       '履歴書（lý lịch）',
       'Giấy tờ công ty mới',
     ],
+    submission: {
+      where: '出入国在留管理局（入管）',
+      whereJp: '地方出入国在留管理局',
+      hours: '9:00-12:00, 13:00-16:00（thứ 2~6）',
+      howToSubmit: [
+        '📥 Download form chính thức → in → điền theo thông tin đã nhập',
+        '📋 Hoặc nộp online qua 在留申請オンラインシステム',
+        '🏢 Mang hồ sơ đến 入管局 gần nhất',
+        '💴 Mua 収入印紙 ¥6,000 (mua sau khi được duyệt)',
+      ],
+      afterSubmit: [
+        '📄 Nhận はがき khi có kết quả — thường 1~2 tháng',
+        '🏢 Mang はがき + hộ chiếu + 在留カード + 収入印紙 đến nhận thẻ mới',
+        '💳 在留カード mới có tư cách mới',
+      ],
+      importantNotes: [
+        '⚠️ KHÔNG được làm hoạt động mới trước khi có tư cách mới',
+        '⚠️ Du học sinh → phải nộp trước khi tốt nghiệp hoặc trong 特定活動 period',
+        '💡 Chuẩn bị hồ sơ đầy đủ = xét duyệt nhanh hơn',
+      ],
+    },
     fields: [
       ...personalFields,
       ...residenceFields,
@@ -271,6 +324,26 @@ export const forms: FormTemplate[] = [
       'Bằng tốt nghiệp + Lý lịch',
       'Giấy tờ công ty / trường học',
     ],
+    submission: {
+      where: '出入国在留管理局（入管）',
+      whereJp: '地方出入国在留管理局',
+      hours: '9:00-12:00, 13:00-16:00（thứ 2~6）',
+      howToSubmit: [
+        '📥 Download form chính thức → in → điền theo thông tin đã nhập',
+        '🏢 Người bảo lãnh tại Nhật nộp đại diện tại 入管局',
+        '📮 Hoặc gửi qua đường bưu điện đến 入管局',
+      ],
+      afterSubmit: [
+        '📄 Kết quả: 1~3 tháng → nhận 在留資格認定証明書',
+        '✈️ Gửi giấy chứng nhận về cho người xin ở nước ngoài',
+        '🏢 Người xin mang giấy đến Đại sứ quán/Lãnh sự quán Nhật để xin visa',
+        '📅 Giấy chứng nhận có hiệu lực 3 tháng — phải nhập cảnh trong thời hạn',
+      ],
+      importantNotes: [
+        '⚠️ Người nộp = người bảo lãnh tại Nhật (công ty/gia đình), KHÔNG phải người xin',
+        '💡 Hồ sơ công ty đầy đủ (決算書, 登記簿) = xét duyệt nhanh hơn',
+      ],
+    },
     fields: [
       ...personalFields,
       { id: 'desired_status', label: 'Tư cách lưu trú muốn xin', labelJp: '希望する在留資格', type: 'select', options: [
@@ -326,6 +399,28 @@ export const forms: FormTemplate[] = [
       '健康保険（bảo hiểm sức khỏe 2 năm）',
       'Thư giới thiệu từ người bảo lãnh（身元保証書）',
     ],
+    submission: {
+      where: '出入国在留管理局（入管）',
+      whereJp: '地方出入国在留管理局',
+      hours: '9:00-12:00, 13:00-16:00（thứ 2~6）',
+      howToSubmit: [
+        '📥 Download form chính thức → in → điền theo thông tin đã nhập',
+        '🏢 Nộp trực tiếp tại 入管局 (KHÔNG nộp online)',
+        '📋 Hồ sơ nhiều — chuẩn bị sẵn theo thứ tự',
+      ],
+      afterSubmit: [
+        '📄 Kết quả: 4~8 tháng (rất lâu!)',
+        '📮 Nhận はがき qua bưu điện',
+        '🏢 Mang はがき + 在留カード + 収入印紙 ¥8,000 đến nhận thẻ mới',
+        '🎉 Thẻ mới ghi「永住者」— không có hạn tư cách (nhưng thẻ vẫn hết hạn sau 7 năm)',
+      ],
+      importantNotes: [
+        '⚠️ Yêu cầu: ở Nhật ≥10 năm, đóng thuế + nenkin đầy đủ',
+        '⚠️ Vợ/chồng người Nhật: ≥3 năm kết hôn + ≥1 năm cư trú',
+        '⚠️ Không có tiền án, không vi phạm giao thông nặng',
+        '💡 Thu nhập ổn định (~¥3,000,000/năm trở lên)',
+      ],
+    },
     fields: [
       ...personalFields,
       ...residenceFields,
@@ -359,6 +454,24 @@ export const forms: FormTemplate[] = [
       '志望動機（Lý do ứng tuyển）= phần quan trọng nhất!',
       'Viết tay hoặc đánh máy đều được（đánh máy phổ biến hơn）',
     ],
+    submission: {
+      where: 'Gửi cho nhà tuyển dụng',
+      whereJp: '応募先企業',
+      howToSubmit: [
+        '📧 Gửi email: đính kèm file PDF',
+        '📮 Gửi bưu điện: in ra → bỏ phong bì A4 → dán tem「履歴書在中」',
+        '🏢 Mang trực tiếp: in ra → bỏ phong bì → nộp tại buổi phỏng vấn',
+      ],
+      afterSubmit: [
+        '📞 Chờ liên hệ từ công ty — thường 1~2 tuần',
+        '📋 Chuẩn bị thêm 職務経歴書 nếu chưa có',
+      ],
+      importantNotes: [
+        '📸 Ảnh 4×3cm: ăn mặc formal, nền trắng/xanh nhạt',
+        '✍️ Viết tay = ấn tượng tốt (一部の企業), nhưng PC cũng OK',
+        '💡 Nhờ người Nhật check chính tả trước khi gửi',
+      ],
+    },
     fields: [
       { id: 'name_kanji', label: 'Họ tên (Kanji)', labelJp: '氏名', type: 'text', required: true, section: 'Thông tin cá nhân（個人情報）' },
       { id: 'name_furigana', label: 'Furigana', labelJp: 'ふりがな', type: 'text', required: true, section: 'Thông tin cá nhân（個人情報）' },
@@ -399,6 +512,24 @@ export const forms: FormTemplate[] = [
       'Nếu đã nộp 確定申告 → one-stop bị vô hiệu, phải khai trong 確定申告',
       'Mỗi lần donate → nộp 1 đơn one-stop',
     ],
+    submission: {
+      where: '自治体 (chính quyền nơi bạn donate)',
+      whereJp: 'ふるさと納税先の自治体',
+      howToSubmit: [
+        '📮 Gửi bưu điện đến 自治体 ghi trên 受領書',
+        '📋 In form → điền → ký tên → gửi kèm bản copy My Number Card (mặt trước + sau)',
+        '⏰ Gửi trước ngày 10/1 năm sau (VD: donate 2025 → gửi trước 10/1/2026)',
+      ],
+      afterSubmit: [
+        '✅ Tự động khấu trừ 住民税 năm sau — không cần 確定申告',
+        '📄 Nhận giấy xác nhận qua bưu điện',
+      ],
+      importantNotes: [
+        '⚠️ One-stop chỉ áp dụng nếu donate ≤ 5 nơi/năm',
+        '⚠️ Nếu > 5 nơi → phải làm 確定申告 thay thế',
+        '⚠️ Nghỉ việc giữa năm / có thu nhập phụ → one-stop KHÔNG dùng được → phải 確定申告',
+      ],
+    },
     fields: [
       { id: 'name', label: 'Họ tên', labelJp: '氏名', type: 'text', required: true, section: 'Thông tin（申請者）' },
       { id: 'my_number', label: 'My Number', labelJp: 'マイナンバー', type: 'text', required: true, section: 'Thông tin（申請者）' },
