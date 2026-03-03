@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import FormPage from './pages/FormPage'
 import About from './pages/About'
 import Privacy from './pages/Privacy'
+import GuidePage from './pages/GuidePage'
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/form/:formId" element={<FormPage />} />
+          <Route path="/guide/:guideId" element={<GuidePage />} />
           <Route path="/about" element={<About />} />
           <Route path="/privacy" element={<Privacy />} />
         </Route>
